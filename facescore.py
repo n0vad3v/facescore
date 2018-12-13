@@ -26,14 +26,14 @@ def read_configure_data(conf_file_path):
         conf_file = "facescore.conf"
     else :
         conf_file = conf_file_path
-    print(conf_file)
+    # print(conf_file)
     with open(conf_file) as f:
         conf_dict = json.load(f)
     return conf_dict
 
-def get_response_data(conf_data):
+def get_response_data(conf_data,*args):
     try:
-        r = requests.post(request_url,data = conf_data,content = 'form-data')
+        r = requests.post(request_url,data = conf_data)
         r.raise_for_status()
         print(r.text)
         return r.text
@@ -49,23 +49,23 @@ def main():
     value_list = [sys.argv[i] for i in range(1,len(sys.argv)) if i%2 == 0]
     arg_dict = {key:value for key in key_list for value in value_list}
     conf_data = read_configure_data(arg_dict.get('-c'))
-    print(arg_dict)
     if conf_data is None:
         print('WTF the -c arguments you write')
         return 
     #这里赋值有问题
-    if conf_data.get('-u') is not None:
+    if arg_dict.get('-u') is not None:
         conf_data['image_url'] = arg_dict['-u']
         requests_type = 'image_url'
-    elif conf_data.get('-f') is not None:
-        conf_data['image_file'] = arg_dict['-f']
+    elif arg_dict.get('-f') is not None:
+        conf_data['image_file'] = open(arg_dict['-f'],'rb')
         requests_type = 'image_file'
-    elif conf_data.get('-b') is not None:
+    elif arg_dict.get('-b') is not None:
         conf_data['image_base64'] = arg_dict['-b']
         requests_type = 'image_base64'
-    print(conf_data)
     if requests_type == "":
         print('WTF the -u|-f|-b arguments you write')
+        return
+    json_data = get_response_data(conf_data)
 
 if __name__ == "__main__":
     main()
