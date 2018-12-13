@@ -20,12 +20,13 @@ use like 'python facescore.py -c facescore.conf -f mypic.jpg'
 request_url = "https://api-cn.faceplusplus.com/facepp/v3/detect"
 
 
-def read_configure_data(*args):
+def read_configure_data(conf_file_path):
     #get a json configure file
-    if len(args) == 0:
+    if conf_file_path is None:
         conf_file = "facescore.conf"
-    if len(args) == 1:
-        conf_file = args[0]
+    else :
+        conf_file = conf_file_path
+    print(conf_file)
     with open(conf_file) as f:
         conf_dict = json.load(f)
     return conf_dict
@@ -34,6 +35,7 @@ def get_response_data(conf_data):
     try:
         r = requests.post(request_url,data = conf_data,content = 'form-data')
         r.raise_for_status()
+        print(r.text)
         return r.text
     except:
         print('requests error')
@@ -43,25 +45,27 @@ def parse_data(json_data):
 
 def main():
     requests_type = ""
-    key_list = [sys.argv[i] for i in range(len(sys.argv)) if i%2 == 0]
-    value_list = [sys.argv[i] for i in range(len(sys.argv)) if i%2 == 1]
+    key_list = [sys.argv[i] for i in range(1,len(sys.argv)) if i%2 == 1]
+    value_list = [sys.argv[i] for i in range(1,len(sys.argv)) if i%2 == 0]
     arg_dict = {key:value for key in key_list for value in value_list}
     conf_data = read_configure_data(arg_dict.get('-c'))
+    print(arg_dict)
     if conf_data is None:
-        print('WTF the arguments you write')
+        print('WTF the -c arguments you write')
         return 
+    #这里赋值有问题
     if conf_data.get('-u') is not None:
-        conf_data['image_url'] = conf_data.get('-u')
+        conf_data['image_url'] = arg_dict['-u']
         requests_type = 'image_url'
     elif conf_data.get('-f') is not None:
-        conf_data['image_file'] = conf_data.get('-f')
+        conf_data['image_file'] = arg_dict['-f']
         requests_type = 'image_file'
     elif conf_data.get('-b') is not None:
-        conf_data['image_base64'] = conf_data.get('-b')
+        conf_data['image_base64'] = arg_dict['-b']
         requests_type = 'image_base64'
-    else :
-        print('WTF the arguments you write')
-        return 
+    print(conf_data)
+    if requests_type == "":
+        print('WTF the -u|-f|-b arguments you write')
 
 if __name__ == "__main__":
     main()
