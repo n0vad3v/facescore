@@ -32,7 +32,7 @@ def read_configure_data(*args):
 
 def get_response_data(conf_data):
     try:
-        r = requests.post(request_url,data = conf_data)
+        r = requests.post(request_url,data = conf_data,content = 'form-data')
         r.raise_for_status()
         return r.text
     except:
