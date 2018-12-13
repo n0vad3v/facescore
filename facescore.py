@@ -52,7 +52,6 @@ def main():
     if conf_data is None:
         print('WTF the -c arguments you write')
         return 
-    #这里赋值有问题
     if arg_dict.get('-u') is not None:
         conf_data['image_url'] = arg_dict['-u']
         requests_type = 'image_url'
