@@ -35,7 +35,7 @@ def get_response_data(conf_data,*args):
     try:
         r = requests.post(request_url,data = conf_data)
         r.raise_for_status()
-        print(r.text)
+#        print(r.text)
         return r.text
     except:
         print('requests error')
@@ -65,6 +65,8 @@ def main():
         print('WTF the -u|-f|-b arguments you write')
         return
     json_data = get_response_data(conf_data)
+    facequality = json.loads(json_data)
+    print(facequality['faces'][0]['attributes']['beauty'])
 
 if __name__ == "__main__":
     main()
